@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>富久美 | 自然の恵みを詰めたお弁当</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@300;500&family=Outfit:wght@200;400&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        :root {
+            --bg-color: #fcfcfc;
+            --text-color: #1a1a1a;
+            --accent-color: #8c8c8c;
+            --font-serif: 'Noto Serif JP', serif;
+            --font-sans-jp: 'Noto Sans JP', sans-serif;
+            --font-sans-en: 'Outfit', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-serif);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+
+        .en {
+            font-family: var(--font-sans-en);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5vw;
+        }
+
+        section {
+            padding: 10rem 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1.2s ease-out;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        header.scrolled {
+            padding: 1.2rem 5vw;
+            background: rgba(252, 252, 252, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
+            letter-spacing: 0.4em;
+            text-decoration: none;
+            color: #fff;
+            font-weight: 500;
+            font-family: var(--font-serif);
+            transition: color 0.5s ease;
+            position: relative;
+            z-index: 1100;
+        }
+
+        header.scrolled .logo,
+        header.nav-open .logo {
+            color: var(--text-color);
+        }
+
+        /* PC Navigation */
+        nav.pc-nav ul {
+            display: flex;
+            list-style: none;
+            gap: clamp(1.5rem, 3vw, 3rem);
+        }
+
+        nav.pc-nav a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+            font-family: var(--font-sans-en);
+        }
+
+        header.scrolled nav.pc-nav a {
+            color: var(--text-color);
+        }
+
+        nav.pc-nav a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Hamburger Menu Icon */
+        .burger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            cursor: pointer;
+            z-index: 1100;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .burger span {
+            display: block;
+            width: 100%;
+            height: 1px;
+            background-color: #fff;
+            transition: all 0.4s ease;
+        }
+
+        header.scrolled .burger span,
+        header.nav-open .burger span {
+            background-color: var(--text-color);
+        }
+
+        /* Burger Animation */
+        header.nav-open .burger span:nth-child(1) {
+            transform: translateY(8.5px) rotate(45deg);
+        }
+        header.nav-open .burger span:nth-child(2) {
+            opacity: 0;
+        }
+        header.nav-open .burger span:nth-child(3) {
+            transform: translateY(-8.5px) rotate(-45deg);
+        }
+
+        /* Mobile Navigation Overlay */
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+            transform: translateY(-100%);
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        header.nav-open + .mobile-nav {
+            transform: translateY(0);
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+            text-align: center;
+        }
+
+        .mobile-nav li {
+            margin: 2.5rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        header.nav-open + .mobile-nav li {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered animation for menu items */
+        header.nav-open + .mobile-nav li:nth-child(1) { transition-delay: 0.2s; }
+        header.nav-open + .mobile-nav li:nth-child(2) { transition-delay: 0.3s; }
+        header.nav-open + .mobile-nav li:nth-child(3) { transition-delay: 0.4s; }
+        header.nav-open + .mobile-nav li:nth-child(4) { transition-delay: 0.5s; }
+
+        .mobile-nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            font-family: var(--font-sans-en);
+            letter-spacing: 0.2em;
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            opacity: 1;
+            transform: none;
+        }
+
+        .hero-visual {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 10vw, 4.5rem);
+            margin-top: 0.5rem;
+            font-weight: 300;
+            letter-spacing: 0.3em;
+            line-height: 1.2;
+        }
+
+        .hero-content .en {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Concept */
+        .concept-content {
+            max-width: 650px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .concept-text {
+            font-size: clamp(0.95rem, 3vw, 1.1rem);
+            margin-top: 2rem;
+            line-height: 2.6;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+
+        /* Menu Section (お品書き) */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(2rem, 5vw, 4rem);
+            margin-top: 4rem;
+        }
+
+        .menu-item {
+            text-decoration: none;
+            color: inherit;
+            font-family: var(--font-sans-jp);
+        }
+
+        .menu-thumb {
+            aspect-ratio: 16 / 9;
+            background: #eee;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+        }
+
+        .menu-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.5s ease;
+        }
+
+        .menu-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .menu-item h3 {
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Products Section (商品紹介) */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .product-card {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            font-family: var(--font-sans-jp);
+        }
+
+        .product-image {
+            aspect-ratio: 16 / 9;
+            background: #f4f4f4;
+            margin-bottom: 1.2rem;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.2s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.08);
+        }
+
+        .product-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            padding: 0 0.2rem;
+        }
+
+        .product-name {
+            font-size: 0.85rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        .product-price {
+            font-family: var(--font-sans-en);
+            font-size: 0.75rem;
+            color: var(--accent-color);
+        }
+
+        /* Info Section */
+        .store-container {
+            margin-top: 4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem;
+        }
+
+        .store-item {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .store-info h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            font-family: var(--font-serif);
+        }
+
+        .info-list {
+            list-style: none;
+            font-family: var(--font-sans-jp);
+        }
+
+        .info-list li {
+            margin-bottom: 1.2rem;
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 300;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .label {
+            width: 80px;
+            color: var(--accent-color);
+            font-size: 0.65rem;
+            font-family: var(--font-sans-en);
+            flex-shrink: 0;
+            padding-top: 0.2rem;
+        }
+
+        .store-map {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #eee;
+            filter: grayscale(1);
+            transition: filter 0.5s ease;
+        }
+
+        .store-map iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* Footer */
+        footer {
+            padding: 8rem 5vw 4rem;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2.5rem;
+        }
+
+        .footer-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            padding: 0;
+        }
+
+        .footer-nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            font-family: var(--font-sans-en);
+            transition: color 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            section { padding: 6rem 0; }
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
+            .store-item { grid-template-columns: 1fr; gap: 2rem; }
+        }
+
+        @media (max-width: 700px) {
+            header { padding: 1.2rem 5vw; }
+            .pc-nav { display: none; }
+            .burger { display: flex; }
+            .products-grid { grid-template-columns: 1fr; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .footer-nav ul { flex-direction: column; gap: 1.2rem; }
+            .info-list li { flex-direction: column; gap: 0.1rem; }
+            .hero-title { letter-spacing: 0.1em; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="loader" id="loader">
+        <div class="en">Loading</div>
+    </div>
+
+    <header id="main-header">
+        <a href="#" class="logo">富久美</a>
+        
+        <!-- PC Navigation -->
+        <nav class="pc-nav">
+            <ul>
+                <li><a href="#concept">CONCEPT</a></li>
+                <li><a href="#menu">MENU</a></li>
+                <li><a href="#products">PRODUCTS</a></li>
+                <li><a href="#info">INFO</a></li>
+            </ul>
+        </nav>
+
+        <!-- Hamburger Icon for Mobile -->
+        <button class="burger" id="burger-btn" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <nav class="mobile-nav" id="mobile-nav-overlay">
+        <ul>
+            <li><a href="#concept">CONCEPT</a></li>
+            <li><a href="#menu">MENU</a></li>
+            <li><a href="#products">PRODUCTS</a></li>
+            <li><a href="#info">INFO</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Hero -->
+        <section class="hero visible">
+            <div class="hero-visual">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2400&auto=format&fit=crop" alt="[お弁当のヒーロー画像]">
+            </div>
+            <div class="hero-content">
+                <span class="en">Art of Lunch</span>
+                <h1 class="hero-title">季節を、一箱に。</h1>
+            </div>
+        </section>
+
+        <!-- Concept -->
+        <section id="concept" class="container">
+            <div class="concept-content">
+                <span class="en">Our Philosophy</span>
+                <p class="concept-text">
+                    私たちは、単に空腹を満たすための道具としてではなく、<br>
+                    一日の句読点となるような、心安らぐ時間を届けたいと考えています。<br><br>
+                    厳選された旬の食材。素材を活かす最小限の調味。<br>
+                    手に馴染む木の器に、日本の四季を丁寧に詰め合わせました。
+                </p>
+            </div>
+        </section>
+
+        <!-- Menu -->
+        <section id="menu" class="container">
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <span class="en">Seasonal Menu</span>
+                <h2>お品書き</h2>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item">
+                    <div class="menu-thumb">
+                        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1200&auto=format&fit=crop" alt="[季節の彩り膳]">
+                    </div>
+                    <h3>季節の彩り膳</h3>
+                    <p class="en">¥1,800</p>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-thumb">
+                        <img src="https://images.unsplash.com/photo-1604497073476-3c62157e5b70?q=80&w=1200&auto=format&fit=crop" alt="[銀鱈の西京焼き弁当]">
+                    </div>
+                    <h3>銀鱈の西京焼き弁当</h3>
+                    <p class="en">¥2,200</p>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-thumb">
+                        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?q=80&w=1200&auto=format&fit=crop" alt="[霧島黒豚の西京焼き御膳]">
+                    </div>
+                    <h3>霧島黒豚の西京焼き御膳</h3>
+                    <p class="en">¥1,950</p>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-thumb">
+                        <img src="https://images.unsplash.com/photo-1551462147-ff29053fad31?q=80&w=1200&auto=format&fit=crop" alt="[丹波産 炊き込みご飯の折詰]">
+                    </div>
+                    <h3>丹波産 炊き込みご飯の折詰</h3>
+                    <p class="en">¥1,600</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products -->
+        <section id="products" class="container">
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <span class="en">Our Selection</span>
+                <h2>商品紹介</h2>
+            </div>
+            <div class="products-grid">
+                <a href="#" class="product-card">
+                    <div class="product-image"><img src="https://images.unsplash.com/photo-1563379091339-03b21bc4a4f8?q=80&w=800&auto=format&fit=crop" alt="[秋田杉 曲げわっぱ 一段]"></div>
+                    <div class="product-meta"><span class="product-name">秋田杉 曲げわっぱ 一段</span><span class="product-price">¥8,800</span></div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image"><img src="https://images.unsplash.com/photo-1598414349190-760799484918?q=80&w=800&auto=format&fit=crop" alt="[特製 和紙包みセット]"></div>
+                    <div class="product-meta"><span class="product-name">特製 和紙包みセット</span><span class="product-price">¥1,200</span></div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image"><img src="https://images.unsplash.com/photo-1511914265872-c40672604a80?q=80&w=800&auto=format&fit=crop" alt="[職人仕立ての箸 漆塗り]"></div>
+                    <div class="product-meta"><span class="product-name">職人仕立ての箸 漆塗り</span><span class="product-price">¥3,500</span></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Information -->
+        <section id="info" class="container">
+            <div style="text-align: center; margin-bottom: 4rem;">
+                <span class="en">Store Information</span>
+                <h2>店舗情報</h2>
+            </div>
+            
+            <div class="store-container">
+                <div class="store-item">
+                    <div class="store-info">
+                        <h3>祐天寺本店</h3>
+                        <ul class="info-list">
+                            <li><span class="label">ADDRESS</span><span>〒153-0052 東京都目黒区祐天寺1-22-3</span></li>
+                            <li><span class="label">OPEN</span><span>11:00 — 18:00</span></li>
+                            <li><span class="label">CLOSE</span><span>Monday</span></li>
+                            <li><span class="label">TEL</span><span>03-0000-0001</span></li>
+                        </ul>
+                    </div>
+                    <div class="store-map">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3242.33918451846!2d139.69176317578583!3d35.64402633199859!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b49e378d38b%3A0xc305886291a92e1b!2z44CSMTUzLTAwNTIgf京驛目黒蛹祐天寺77yR5LiB55uu77yS77yS4oiS77yT!5e0!3m2!1sja!2sjp!4v1710000000000!5m2!1sja!2sjp" loading="lazy"></iframe>
+                    </div>
+                </div>
+
+                <div class="store-item">
+                    <div class="store-info">
+                        <h3>日本橋店</h3>
+                        <ul class="info-list">
+                            <li><span class="label">ADDRESS</span><span>〒103-0022 東京都中央区日本橋本町1丁目4-1 鳥千ビル1F</span></li>
+                            <li><span class="label">OPEN</span><span>11:00 — 19:00</span></li>
+                            <li><span class="label">CLOSE</span><span>Sunday</span></li>
+                            <li><span class="label">TEL</span><span>03-0000-0002</span></li>
+                        </ul>
+                    </div>
+                    <div class="store-map">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3240.730339458238!2d139.7719711757876!3d35.683636230000006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018895085449767%3A0x679093848a6237b2!2z44CSMTAzLTAwMjIgf京驛中央蛹日本橋本町77yR5LiB55uu77yU4oiS77yR!5e0!3m2!1sja!2sjp!4v1710000000001!5m2!1sja!2sjp" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="logo" style="color: var(--text-color);">富久美</div>
+            <nav class="footer-nav">
+                <ul>
+                    <li><a href="#concept">CONCEPT</a></li>
+                    <li><a href="#menu">MENU</a></li>
+                    <li><a href="#products">PRODUCTS</a></li>
+                    <li><a href="#info">INFO</a></li>
+                </ul>
+            </nav>
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; 2024 富久美 All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const header = document.getElementById('main-header');
+        const burgerBtn = document.getElementById('burger-btn');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
+
+        // Scroll Event for Header
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Toggle Mobile Nav
+        burgerBtn.addEventListener('click', () => {
+            header.classList.toggle('nav-open');
+            // Prevent body scroll when menu is open
+            document.body.style.overflow = header.classList.contains('nav-open') ? 'hidden' : '';
+        });
+
+        // Close Mobile Nav when clicking a link
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                header.classList.remove('nav-open');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Smooth Scroll handling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === "#") return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const headerOffset = 80;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Reveal animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // Loader
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
